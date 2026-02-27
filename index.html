@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Token de prueba</title>
+  <script type="module">
+    // Configuración Firebase (reemplaza con la tuya)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+    import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-messaging.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzKHOwWJIuC4_f2OMuoEyMxJnucC-jr5I",
+      authDomain: "alerta-rosko.firebaseapp.com",
+      projectId: "alerta-rosko",
+      storageBucket: "alerta-rosko.firebasestorage.app",
+      messagingSenderId: "1022811358317",
+      appId: "1:1022811358317:web:ce210848e7ed63d1412b64",
+      measurementId: "undefined"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    async function registrarToken() {
+      try {
+        const token = await getToken(messaging, { vapidKey: "<TU_PUBLIC_VAPID_KEY>" });
+        console.log("Token generado:", token);
+
+        // Enviar token a tu servidor
+        const resp = await fetch("https://alertas-rosko.onrender.com/registrar-token", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token })
+        });
+        const data = await resp.json();
+        console.log("Servidor respondió:", data);
+      } catch (err) {
+        console.error("Error generando token:", err);
+      }
+    }
+
+    registrarToken();
+
+    // Escuchar notificaciones cuando la página está abierta
+    onMessage(messaging, (payload) => {
+      alert("Notificación recibida: " + payload.notification.body);
+    });
+  </script>
+</head>
+<body>
+  <h1>Generando token para pruebas...</h1>
+</body>
+</html>
